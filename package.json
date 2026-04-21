@@ -1,0 +1,11 @@
+{
+  "name": "fitness_wellness",
+  "version": "1.0.0",
+  "description": "Fitness Wellness Management System",
+  "private": true,
+  "author": "Your Organization",
+  "license": "mit",
+  "engines": {
+    "node": ">=18"
+  }
+}
