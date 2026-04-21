@@ -7,5 +7,8 @@
   "license": "mit",
   "engines": {
     "node": ">=18"
+  },
+  "frappe": {
+    "app_name": "fitness_wellness"
   }
 }
