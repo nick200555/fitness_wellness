@@ -1,0 +1,9 @@
+*.pdf
+pdf_content.txt
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.env
+node_modules/
