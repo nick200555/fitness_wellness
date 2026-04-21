@@ -1,5 +1,5 @@
 app_name = "fitness_wellness"
-app_title = "Fitness Wellness"
+app_title = "fitness Wellness"
 app_publisher = "Your Organization"
 app_description = "Fitness and Wellness Management System for ERPNext v15+"
 app_email = "admin@example.com"

@@ -1,0 +1,2197 @@
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 1
+FWS
+Fitness & Wellness
+Management System
+Frappe Framework | ERPNext v15+
+Complete Architecture | DocTypes | Workflows | Implementation Plan
+Version 1.0 | 2026
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 2
+Table of Contents
+1
+System Overview
+3
+2
+App Structure & Directory Layout
+4
+3
+Module 1 — Member & Subscription Management
+5
+4
+Module 2 — Class & Schedule Management
+8
+5
+Module 3 — Trainer & Staff Management
+11
+6
+Module 4 — Facility & Equipment Management
+13
+7
+Module 5 — Health & Fitness Assessment
+15
+8
+Module 6 — Nutrition & Diet Management
+17
+9
+Module 7 — Billing & Finance
+19
+10
+Module 8 — Reports & Analytics
+21
+11
+Workflows
+23
+12
+ERPNext Integration Points
+26
+13
+Implementation Roadmap
+28
+14
+Technical Decisions & Configuration
+30
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 3
+1. System Overview
+Project Summary
+The Fitness & Wellness Management System (FWS) is a custom Frappe application built on top of ERPNext v15+. It covers the
+complete fitness business value chain — from member onboarding and subscription management through class scheduling, trainer
+management, equipment maintenance, health assessments, nutrition planning, and billing — integrating natively with ERPNext's
+Accounts, HR, Stock, and CRM modules.
+Core Modules
+8
+DocTypes (total)
+58+
+Script Reports
+11
+ERPNext Integrations
+6 modules
+Custom Roles
+7
+Build Phases
+5 phases / ~22 weeks
+Core Modules at a Glance
+ Module
+ Scope
+ Member & Subscription
+Member registry, subscription plans, renewals, attendance, freeze/cancel
+Class & Schedule
+Class types, timetables, batch enrollment, trainer assignment, waitlists
+Trainer & Staff
+Trainer profiles, certifications, availability, performance, commission
+Facility & Equipment
+Equipment register, maintenance schedules, AMC contracts, locker mgmt
+Health & Fitness Assessment
+Body metrics, fitness tests, goal tracking, progress reports
+Nutrition & Diet
+Diet plans, meal templates, supplement tracking, nutrition goals
+Billing & Finance
+Plan invoices, POS walk-in payments, EMI, refunds, daily cash reconciliation
+Reports & Analytics
+Revenue, retention, attendance, trainer performance, P&L; dashboards
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 4
+2. App Structure & Directory Layout
+The app is created using bench new-app fitness_wellness and installed on the target ERPNext site.
+Directory Layout
+fitness_wellness/                  # Frappe bench app root
+■■■ fitness_wellness/
+■   ■■■ __init__.py
+■   ■■■ hooks.py                   # Scheduler, doc events, fixtures
+■   ■■■ patches.txt
+■   ■■■ config/
+■   ■   ■■■ desktop.py             # Workspace module tiles
+■   ■   ■■■ docs.py
+■   ■■■ member_management/
+■   ■   ■■■ doctype/
+■   ■   ■   ■■■ member/
+■   ■   ■   ■■■ membership_plan/
+■   ■   ■   ■■■ member_subscription/
+■   ■   ■   ■■■ member_attendance/
+■   ■   ■   ■■■ subscription_freeze/
+■   ■   ■   ■■■ referral_record/
+■   ■   ■■■ report/
+■   ■■■ class_management/
+■   ■   ■■■ doctype/
+■   ■   ■   ■■■ class_type/
+■   ■   ■   ■■■ class_schedule/
+■   ■   ■   ■■■ class_enrollment/
+■   ■   ■   ■■■ class_attendance/
+■   ■   ■   ■■■ waitlist_entry/
+■   ■   ■   ■■■ class_package/
+■   ■   ■■■ report/
+■   ■■■ trainer_management/
+■   ■   ■■■ doctype/
+■   ■   ■   ■■■ trainer_profile/
+■   ■   ■   ■■■ trainer_certification/
+■   ■   ■   ■■■ trainer_availability/
+■   ■   ■   ■■■ trainer_assignment/
+■   ■   ■   ■■■ trainer_commission/
+■   ■   ■■■ report/
+■   ■■■ facility_management/
+■   ■   ■■■ doctype/
+■   ■   ■   ■■■ equipment_register/
+■   ■   ■   ■■■ maintenance_schedule/
+■   ■   ■   ■■■ maintenance_log/
+■   ■   ■   ■■■ amc_contract/
+■   ■   ■   ■■■ locker_master/
+■   ■   ■   ■■■ locker_assignment/
+■   ■■■ health_assessment/
+■   ■   ■■■ doctype/
+■   ■   ■   ■■■ health_profile/
+■   ■   ■   ■■■ body_metric_log/
+■   ■   ■   ■■■ fitness_test/
+■   ■   ■   ■■■ fitness_goal/
+■   ■   ■   ■■■ progress_photo/
+■   ■■■ nutrition/
+■   ■   ■■■ doctype/
+■   ■   ■   ■■■ diet_plan/
+■   ■   ■   ■■■ meal_template/
+■   ■   ■   ■■■ nutrition_goal/
+■   ■   ■   ■■■ supplement_log/
+■   ■   ■   ■■■ food_item/
+■   ■■■ billing/
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 5
+■   ■   ■■■ doctype/
+■   ■   ■   ■■■ membership_invoice/
+■   ■   ■   ■■■ walk_in_payment/
+■   ■   ■   ■■■ emi_schedule/
+■   ■   ■   ■■■ refund_request/
+■   ■   ■   ■■■ daily_cash_reconciliation/
+■   ■■■ utils/
+■   ■   ■■■ calculations.py        # Proration, EMI, commission engine
+■   ■   ■■■ notifications.py       # SMS/email triggers
+■   ■   ■■■ validators.py
+■   ■■■ public/
+■   ■   ■■■ js/                    # Client scripts
+■   ■   ■■■ css/
+■   ■■■ templates/
+■   ■   ■■■ pages/                 # Member portal pages
+■   ■■■ fixtures/
+■       ■■■ custom_fields.json
+■       ■■■ property_setters.json
+■       ■■■ roles.json
+■■■ setup.py
+■■■ MANIFEST.in
+■■■ requirements.txt
+hooks.py — Key Configuration
+scheduler_events = {
+    "daily": [
+        "fitness_wellness.tasks.send_membership_expiry_reminders",
+        "fitness_wellness.tasks.auto_generate_monthly_invoices",
+        "fitness_wellness.tasks.check_equipment_maintenance_due",
+        "fitness_wellness.tasks.mark_absent_unbooked_members",
+    ],
+    "weekly": [
+        "fitness_wellness.tasks.generate_trainer_commission_vouchers",
+        "fitness_wellness.tasks.send_weekly_progress_reports",
+    ],
+    "monthly": [
+        "fitness_wellness.tasks.process_emi_deductions",
+    ]
+}
+roles = [
+    "Fitness Manager", "Front Desk Executive", "Trainer",
+    "Dietitian", "Member", "Accounts Executive", "Facility Supervisor"
+]
+doc_events = {
+    "Member Subscription": {
+        "on_submit": "fitness_wellness.billing.auto_create_membership_invoice",
+        "on_cancel": "fitness_wellness.member_management.handle_subscription_cancel"
+    },
+    "Class Enrollment": {
+        "on_submit": "fitness_wellness.class_management.update_class_capacity"
+    },
+    "Membership Invoice": {
+        "on_submit": "fitness_wellness.billing.create_sales_invoice"
+    }
+}
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 6
+3. Module 1 — Member & Subscription Management
+Central module managing the complete member lifecycle — from initial enquiry and onboarding through subscription plan
+assignment, attendance tracking, freeze/cancellation, and referral programs. Members are modelled as ERPNext Customers with
+extended custom fields.
+Member Master DocType — Master
+Core member register. One record per member with full personal and fitness profile.
+Field Name
+Type
+ Description
+ member_id
+Data
+Unique system-generated member ID (e.g. MEM-2026-0001)
+full_name
+Data
+Member's full name
+customer
+Link → Customer
+Linked ERPNext Customer record
+date_of_birth
+Date
+Date of birth for age calculation
+gender
+Select
+Male / Female / Other
+mobile
+Data
+Primary contact number
+email
+Data
+Email address for portal and notifications
+emergency_contact
+Data
+Emergency contact name and number
+photo
+Attach Image
+Member profile photograph
+join_date
+Date
+Date of first enrollment
+status
+Select
+Active / Frozen / Expired / Cancelled
+source
+Select
+Walk-In / Online / Referral / Corporate
+referred_by
+Link → Member
+Referring member (if source = Referral)
+blood_group
+Select
+A+ / A- / B+ / B- / O+ / O- / AB+ / AB-
+medical_conditions
+Long Text
+Declared medical conditions or injuries
+address
+Long Text
+Residential address
+id_proof_type
+Select
+Aadhar / Passport / PAN / Driving Licence
+id_proof_number
+Data
+ID document number
+corporate_account
+Link → Customer
+Corporate account if B2B member
+locker_assigned
+Link → Locker Master
+Assigned locker (if any)
+Membership Plan DocType — Master
+Defines available plans with pricing, duration, and included entitlements.
+Field Name
+Type
+ Description
+ plan_name
+Data
+e.g. Monthly Fitness, Annual Elite, Quarterly Yoga
+plan_code
+Data
+Short unique plan code
+duration_months
+Int
+Plan validity in months
+price
+Currency
+Plan fee (exclusive of taxes)
+tax_template
+Link → Tax Template
+GST / tax template to apply
+plan_type
+Select
+Basic / Standard / Premium / Corporate
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 7
+Field Name
+Type
+ Description
+ access_type
+Select
+Gym Only / Gym + Pool / All Facilities
+class_credits
+Int
+Number of group class sessions included
+guest_passes
+Int
+Complimentary guest passes per month
+personal_training_sessions
+Int
+PT sessions included
+freeze_allowed_days
+Int
+Max days subscription can be frozen
+discount_on_renewal
+Float
+% discount on renewal
+is_active
+Check
+Plan is currently offered
+Member Subscription DocType — Transaction
+Active subscription record per member. On submit, auto-creates a Membership Invoice.
+Field Name
+Type
+ Description
+ member
+Link → Member
+Subscribing member
+plan
+Link → Membership
+Plan
+Selected membership plan
+start_date
+Date
+Subscription start date
+end_date
+Date
+Subscription expiry (auto-calculated from start + months)
+actual_amount
+Currency
+Invoice amount after discounts
+discount_amount
+Currency
+Discount applied
+payment_mode
+Select
+Cash / Card / UPI / EMI / Corporate
+emi_months
+Int
+Number of EMI instalments (if EMI mode)
+class_credits_remaining
+Int
+Remaining class credits in current period
+pt_sessions_remaining
+Int
+Remaining personal training sessions
+status
+Select
+Active / Frozen / Expired / Cancelled
+membership_invoice
+Link → Membership
+Invoice
+Auto-created invoice on submit
+sales_invoice
+Link → Sales Invoice
+Linked ERPNext Sales Invoice
+renewal_of
+Link → Member
+Subscription
+Previous subscription (for renewals)
+notes
+Text
+Internal notes
+Member Attendance DocType — Transaction
+Daily check-in/check-out record per member. Can be triggered by biometric scanner, QR code, or manual entry.
+Field Name
+Type
+ Description
+ member
+Link → Member
+Attending member
+date
+Date
+Attendance date
+check_in_time
+Time
+Entry time (from biometric / manual)
+check_out_time
+Time
+Exit time
+duration_minutes
+Int
+Time spent (auto-calculated)
+access_point
+Data
+Turnstile / scanner ID
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 8
+Field Name
+Type
+ Description
+ attendance_type
+Select
+Gym / Class / Pool / Spa
+subscription
+Link → Member
+Subscription
+Active subscription at time of entry
+Subscription Freeze DocType — Transaction
+Manages temporary suspension of a member's subscription (medical, travel, etc.). Extends end date automatically.
+Field Name
+Type
+ Description
+ member_subscription
+Link → Member
+Subscription
+Subscription being frozen
+freeze_from
+Date
+Freeze start date
+freeze_to
+Date
+Freeze end date
+reason
+Select
+Medical / Travel / Personal / Other
+days_frozen
+Int
+Auto-calculated freeze duration
+new_end_date
+Date
+Revised subscription expiry after freeze
+approved_by
+Link → User
+Staff who approved the freeze
+doctor_certificate
+Attach
+Supporting document (if medical)
+Referral Record DocType — Transaction
+Field Name
+Type
+ Description
+ referrer
+Link → Member
+Member who made the referral
+referred_member
+Link → Member
+New member who joined via referral
+referral_date
+Date
+Date referral was registered
+reward_type
+Select
+Discount / Free Month / Cash Credit / Gift
+reward_value
+Currency
+Monetary value of reward
+status
+Select
+Pending / Qualified / Rewarded
+reward_applied_on
+Date
+Date reward was credited to referrer
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 9
+4. Module 2 — Class & Schedule Management
+Manages all group fitness class offerings — yoga, Zumba, spinning, HIIT, aqua aerobics, etc. Covers class type catalogue, weekly
+timetables, batch enrollment, real-time capacity management, waitlists, and attendance marking.
+Class Type DocType — Master
+Field Name
+Type
+ Description
+ class_name
+Data
+e.g. Yoga, Zumba, HIIT, Spinning, Aqua Aerobics
+category
+Select
+Cardio / Strength / Flexibility / Mind-Body / Aqua
+description
+Long Text
+Class description for member portal
+default_duration_minutes
+Int
+Standard class duration
+max_capacity
+Int
+Maximum participants per session
+min_capacity
+Int
+Minimum participants to run the class
+intensity_level
+Select
+Beginner / Intermediate / Advanced / All Levels
+required_equipment
+Long Text
+Equipment members must bring or available in studio
+calories_burned_avg
+Int
+Average calorie burn per session (for display)
+is_chargeable
+Check
+Requires separate class credit or fee
+Class Schedule DocType — Master / Transaction
+Defines recurring weekly or one-off class sessions. Generates individual Class Session records via scheduler.
+Field Name
+Type
+ Description
+ class_type
+Link → Class Type
+Type of fitness class
+trainer
+Link → Trainer Profile
+Assigned trainer / instructor
+room_studio
+Data
+Studio / room name
+schedule_type
+Select
+Recurring / One-Off
+day_of_week
+Select
+Monday through Sunday (for recurring)
+start_time
+Time
+Class start time
+end_time
+Time
+Class end time (auto from duration)
+valid_from
+Date
+Timetable validity start
+valid_to
+Date
+Timetable validity end
+max_capacity
+Int
+Override class-type default if needed
+waitlist_enabled
+Check
+Allow members to join waitlist when full
+is_active
+Check
+Schedule is currently running
+Class Enrollment DocType — Transaction
+Member booking record for a specific class session. Deducts class credit on submit.
+Field Name
+Type
+ Description
+ member
+Link → Member
+Enrolling member
+class_schedule
+Link → Class Schedule
+Target class session
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 10
+Field Name
+Type
+ Description
+ enrollment_date
+Date
+Date booking was made
+session_date
+Date
+Date of the class session
+status
+Select
+Confirmed / Waitlisted / Cancelled / No-Show
+credit_deducted
+Check
+Class credit deducted from subscription
+booking_source
+Select
+App / Front Desk / Portal / Walk-In
+cancellation_reason
+Data
+Reason if cancelled (for analytics)
+cancellation_time
+Datetime
+Time of cancellation (for late-cancel policy)
+Class Attendance DocType — Transaction
+Actual attendance for a class session. Marked by trainer or front desk after the session.
+Field Name
+Type
+ Description
+ class_schedule
+Link → Class Schedule
+The class session
+session_date
+Date
+Date of session
+trainer
+Link → Trainer Profile
+Trainer who conducted the session
+total_enrolled
+Int
+Members enrolled for this session
+total_attended
+Int
+Members who actually attended
+attendance_details
+Table → Attendance
+Row
+Per-member attendance (Present / Absent / Late)
+trainer_notes
+Text
+Trainer observations or session notes
+session_rating_avg
+Float
+Average member rating (1–5)
+Waitlist Entry DocType — Transaction
+Field Name
+Type
+ Description
+ member
+Link → Member
+Member on the waitlist
+class_schedule
+Link → Class Schedule
+Class they are waitlisted for
+session_date
+Date
+Session date
+position
+Int
+Position in queue (1 = first to be offered)
+notified
+Check
+Member notified when slot opened
+notification_time
+Datetime
+Time of notification
+accepted
+Check
+Member accepted the slot
+expiry_time
+Datetime
+Deadline for member to accept before next in queue is notified
+Class Package DocType — Master
+Standalone class packs for non-members or members wanting additional credits beyond their plan.
+Field Name
+Type
+ Description
+ package_name
+Data
+e.g. 10-Class Yoga Pack, 20-Session HIIT Bundle
+class_type
+Link → Class Type
+Applicable class type (blank = any class)
+no_of_sessions
+Int
+Number of class sessions in the pack
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 11
+Field Name
+Type
+ Description
+ price
+Currency
+Pack price
+validity_days
+Int
+Days within which sessions must be used
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 12
+5. Module 3 — Trainer & Staff Management
+Manages all fitness trainers, yoga instructors, personal trainers, dietitians, and support staff. Covers profiles, certifications, availability
+slots, member assignments, performance metrics, and commission calculations. Trainers are linked to ERPNext Employee records.
+Trainer Profile DocType — Master
+Field Name
+Type
+ Description
+ trainer_code
+Data
+Unique trainer ID (e.g. TRN-2026-001)
+employee
+Link → Employee
+Linked ERPNext Employee record
+specialization
+Select
+Personal Training / Yoga / Zumba / Nutrition / Rehab / Group Fitness
+experience_years
+Int
+Years of professional experience
+bio
+Long Text
+Trainer profile for member-facing portal
+photo
+Attach Image
+Profile photo
+rating
+Float
+Average member rating (auto-calculated)
+max_pt_clients
+Int
+Maximum personal training clients allowed
+pt_hourly_rate
+Currency
+Rate per personal training hour
+commission_type
+Select
+Fixed / Percentage / Per Session
+commission_rate
+Float
+Commission % or flat amount per session
+status
+Select
+Active / On Leave / Resigned
+Trainer Certification DocType — Transaction
+Field Name
+Type
+ Description
+ trainer
+Link → Trainer Profile
+Certified trainer
+certification_name
+Data
+e.g. ACE-CPT, NASM-PT, RYT-200, Crossfit L1
+issuing_body
+Data
+Certifying organization
+issue_date
+Date
+Certificate issue date
+expiry_date
+Date
+Certificate expiry date
+certificate_number
+Data
+Certificate reference number
+document
+Attach
+Scanned certificate
+status
+Select
+Valid / Expired / Renewal Pending
+Trainer Availability DocType — Master
+Weekly availability slots for each trainer, used for PT booking and class scheduling.
+Field Name
+Type
+ Description
+ trainer
+Link → Trainer Profile
+Trainer whose availability is defined
+day_of_week
+Select
+Monday / Tuesday / ... / Sunday
+from_time
+Time
+Availability slot start
+to_time
+Time
+Availability slot end
+slot_type
+Select
+Personal Training / Group Class / Both
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 13
+Field Name
+Type
+ Description
+ is_available
+Check
+Slot is open for booking
+Trainer Assignment DocType — Transaction
+Personal trainer assignment record linking a trainer to a member for PT sessions.
+Field Name
+Type
+ Description
+ member
+Link → Member
+Member receiving personal training
+trainer
+Link → Trainer Profile
+Assigned personal trainer
+start_date
+Date
+Assignment start date
+end_date
+Date
+Assignment end date
+total_sessions_agreed
+Int
+Total PT sessions contracted
+sessions_completed
+Int
+Sessions conducted so far (auto-updated)
+sessions_remaining
+Int
+Remaining sessions (auto-calculated)
+session_frequency
+Select
+Daily / 3x Week / 2x Week / Weekly
+focus_area
+Data
+E.g. Weight Loss, Muscle Gain, Rehabilitation
+goal_notes
+Text
+Member fitness goals and trainer plan
+Trainer Commission DocType — Transaction
+Monthly commission calculation for each trainer. Auto-generated by weekly scheduler. Creates Journal Entry on submit.
+Field Name
+Type
+ Description
+ trainer
+Link → Trainer Profile
+Trainer for whom commission is calculated
+period_from
+Date
+Commission period start
+period_to
+Date
+Commission period end
+group_sessions_taken
+Int
+Number of group class sessions conducted
+pt_sessions_taken
+Int
+Number of PT sessions conducted
+gross_commission
+Currency
+Total commission before deductions
+tds_deducted
+Currency
+TDS deduction amount
+net_payable
+Currency
+Final payout amount
+journal_entry
+Link → Journal Entry
+ERPNext JE created on submit
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 14
+6. Module 4 — Facility & Equipment Management
+Tracks all fitness equipment (treadmills, bikes, weights, reformers) and facility assets (lockers, studios, pools). Manages preventive
+maintenance schedules, breakdown logs, AMC contracts, and locker assignments. Equipment is linked to ERPNext Assets for
+depreciation.
+Equipment Register DocType — Master
+Field Name
+Type
+ Description
+ equipment_code
+Data
+Unique asset code (e.g. EQP-2026-001)
+equipment_name
+Data
+Name / model of equipment
+category
+Select
+Cardio / Strength / Flexibility / Studio / Pool / Utility
+brand
+Data
+Manufacturer / brand name
+model_number
+Data
+Model / part number
+purchase_date
+Date
+Date of purchase
+purchase_cost
+Currency
+Original purchase cost
+asset
+Link → Asset
+Linked ERPNext Fixed Asset
+location
+Data
+Floor / room / zone where equipment is placed
+serial_number
+Data
+Manufacturer serial number
+warranty_expiry
+Date
+Warranty expiry date
+amc_contract
+Link → AMC Contract
+Active AMC/service contract
+status
+Select
+Operational / Under Maintenance / Out of Service / Scrapped
+last_service_date
+Date
+Date of last maintenance service
+next_service_due
+Date
+Scheduled next service date
+Maintenance Schedule DocType — Master
+Field Name
+Type
+ Description
+ equipment
+Link → Equipment
+Register
+Equipment being scheduled
+maintenance_type
+Select
+Preventive / Corrective / Calibration / Deep Clean
+frequency
+Select
+Daily / Weekly / Monthly / Quarterly / Annual
+last_done_date
+Date
+Last completed maintenance date
+next_due_date
+Date
+Next scheduled maintenance date (auto-calculated)
+assigned_to
+Select
+In-House / AMC Vendor
+vendor
+Link → Supplier
+External vendor if AMC
+estimated_duration_hours
+Float
+Expected downtime in hours
+is_active
+Check
+Schedule is currently active
+Maintenance Log DocType — Transaction
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 15
+Field Name
+Type
+ Description
+ equipment
+Link → Equipment
+Register
+Equipment serviced
+maintenance_date
+Date
+Date service was performed
+maintenance_type
+Select
+Preventive / Corrective / Breakdown
+work_done
+Long Text
+Description of work performed
+parts_replaced
+Long Text
+Parts or consumables replaced
+cost
+Currency
+Service cost
+technician
+Data
+Technician name or company
+downtime_hours
+Float
+Total equipment downtime
+next_service_date
+Date
+Date of next scheduled service
+status
+Select
+Completed / Partial / Pending Follow-Up
+AMC Contract DocType — Master
+Field Name
+Type
+ Description
+ contract_number
+Data
+AMC reference number
+vendor
+Link → Supplier
+AMC service vendor
+start_date
+Date
+Contract start date
+end_date
+Date
+Contract expiry date
+annual_value
+Currency
+Annual contract value
+covered_equipment
+Table → Equipment
+Row
+List of equipment covered under this AMC
+service_visits_per_year
+Int
+Scheduled service visits included
+response_time_hours
+Int
+Guaranteed breakdown response time in hours
+purchase_order
+Link → Purchase Order
+Linked ERPNext PO
+Locker Master DocType — Master
+Field Name
+Type
+ Description
+ locker_number
+Data
+Locker ID / number
+locker_zone
+Data
+Zone / row (e.g. Male Wing A, Female Wing B)
+locker_size
+Select
+Small / Medium / Large
+monthly_charge
+Currency
+Monthly rental fee
+status
+Select
+Available / Occupied / Maintenance
+assigned_member
+Link → Member
+Currently assigned member
+assignment_date
+Date
+Date locker was assigned
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 16
+7. Module 5 — Health & Fitness Assessment
+Manages complete member health and fitness data — initial assessments, periodic body metric logs, fitness test results (strength,
+endurance, flexibility), goal setting and tracking, and progress photos. Linked to trainer assignments and diet plans.
+Health Profile DocType — Master
+One health profile per member. Stores initial assessment data and primary health goals.
+Field Name
+Type
+ Description
+ member
+Link → Member
+Profile owner
+assessment_date
+Date
+Date of initial health assessment
+height_cm
+Float
+Height in centimetres
+initial_weight_kg
+Float
+Weight at time of joining
+initial_bmi
+Float
+BMI at joining (auto-calculated)
+primary_goal
+Select
+Weight Loss / Muscle Gain / Endurance / Flexibility / General Wellness / Rehab
+activity_level
+Select
+Sedentary / Lightly Active / Moderately Active / Very Active
+dietary_preference
+Select
+Vegetarian / Vegan / Non-Vegetarian / Keto / Other
+existing_injuries
+Long Text
+Declared injuries or contraindications
+doctor_clearance
+Check
+Has medical clearance been obtained?
+doctor_clearance_doc
+Attach
+Uploaded clearance document
+par_q_completed
+Check
+Physical Activity Readiness Questionnaire completed
+Body Metric Log DocType — Transaction
+Periodic body composition measurements. Multiple logs per member over time for progress tracking.
+Field Name
+Type
+ Description
+ member
+Link → Member
+Member being measured
+log_date
+Date
+Measurement date
+weight_kg
+Float
+Current body weight
+bmi
+Float
+Body Mass Index (auto-calculated)
+body_fat_percentage
+Float
+Body fat %
+muscle_mass_kg
+Float
+Lean muscle mass in kg
+waist_cm
+Float
+Waist circumference
+hip_cm
+Float
+Hip circumference
+chest_cm
+Float
+Chest measurement
+arm_cm
+Float
+Bicep circumference
+thigh_cm
+Float
+Thigh circumference
+resting_heart_rate
+Int
+Resting heart rate (bpm)
+blood_pressure
+Data
+BP reading (e.g. 120/80)
+measured_by
+Link → Trainer Profile
+Trainer who took measurements
+notes
+Text
+Observations or notes
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 17
+Fitness Test DocType — Transaction
+Field Name
+Type
+ Description
+ member
+Link → Member
+Member tested
+test_date
+Date
+Test date
+trainer
+Link → Trainer Profile
+Conducting trainer
+test_type
+Select
+Initial / 3-Month / 6-Month / Annual / Pre-Event
+push_ups_count
+Int
+Max push-ups in one set
+pull_ups_count
+Int
+Max pull-ups
+plank_seconds
+Int
+Plank hold duration (seconds)
+flexibility_cm
+Float
+Sit-and-reach result (cm)
+vo2_max_estimate
+Float
+Estimated VO2 Max
+1rm_bench_kg
+Float
+One-rep max bench press
+1rm_squat_kg
+Float
+One-rep max squat
+5km_run_minutes
+Float
+5 km run time in minutes
+overall_fitness_score
+Float
+Composite score (calculated)
+fitness_level
+Select
+Poor / Below Average / Average / Good / Excellent
+Fitness Goal DocType — Transaction
+Field Name
+Type
+ Description
+ member
+Link → Member
+Goal owner
+goal_type
+Select
+Weight Loss / Muscle Gain / Endurance / Strength / Flexibility / Event Prep
+target_value
+Float
+Numeric target (e.g. target weight, target body fat %)
+target_unit
+Data
+Unit of measure (kg, %, mins, etc.)
+target_date
+Date
+Goal achievement deadline
+baseline_value
+Float
+Starting point at goal creation
+current_value
+Float
+Latest tracked value (updated from metric logs)
+progress_pct
+Float
+% progress towards goal (auto-calculated)
+status
+Select
+In Progress / Achieved / Missed / Revised
+trainer
+Link → Trainer Profile
+Trainer supporting this goal
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 18
+8. Module 6 — Nutrition & Diet Management
+Manages personalized diet plans created by dietitians or trainers. Includes meal templates, food item database, supplement tracking,
+and nutrition goal monitoring. Integrates with Health Profile for goal alignment.
+Food Item DocType — Master
+Field Name
+Type
+ Description
+ food_name
+Data
+Food item name (e.g. Brown Rice, Chicken Breast)
+food_group
+Select
+Grains / Protein / Dairy / Fruits / Vegetables / Fats / Beverages
+serving_size_g
+Float
+Standard serving size in grams
+calories_per_serving
+Float
+Calories per serving
+protein_g
+Float
+Protein per serving (g)
+carbs_g
+Float
+Carbohydrates per serving (g)
+fat_g
+Float
+Fat per serving (g)
+fibre_g
+Float
+Dietary fibre per serving (g)
+sodium_mg
+Float
+Sodium per serving (mg)
+is_veg
+Check
+Suitable for vegetarians
+is_vegan
+Check
+Suitable for vegans
+is_gluten_free
+Check
+Gluten-free item
+Meal Template DocType — Master
+Pre-defined meal structures (breakfast, lunch, dinner, snacks) that can be reused across multiple diet plans.
+Field Name
+Type
+ Description
+ template_name
+Data
+e.g. High Protein Breakfast, Pre-Workout Snack
+meal_type
+Select
+Breakfast / Mid-Morning / Lunch / Evening Snack / Dinner / Pre-Workout / Post-Workout
+goal_type
+Select
+Weight Loss / Muscle Gain / Maintenance / Endurance
+items
+Table → Meal Item
+Food items with quantity and preparation notes
+total_calories
+Float
+Total calories (auto-calculated from items)
+total_protein_g
+Float
+Total protein (auto-calculated)
+total_carbs_g
+Float
+Total carbs (auto-calculated)
+total_fat_g
+Float
+Total fat (auto-calculated)
+Diet Plan DocType — Transaction
+Personalized diet plan assigned to a member by a dietitian or trainer. Covers a 7–30 day period.
+Field Name
+Type
+ Description
+ member
+Link → Member
+Member the plan is for
+dietitian
+Link → Trainer Profile
+Assigning dietitian or trainer
+plan_name
+Data
+Descriptive plan name
+start_date
+Date
+Plan start date
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 19
+Field Name
+Type
+ Description
+ end_date
+Date
+Plan end date
+goal
+Link → Fitness Goal
+Associated fitness goal
+daily_calorie_target
+Float
+Total daily calorie target
+protein_target_g
+Float
+Daily protein target (g)
+carbs_target_g
+Float
+Daily carbohydrates target (g)
+fat_target_g
+Float
+Daily fat target (g)
+water_intake_litres
+Float
+Daily water intake target
+meal_schedule
+Table → Diet Day
+Day-wise meal breakdown using Meal Templates
+special_notes
+Text
+Allergies, intolerances, cultural restrictions
+status
+Select
+Active / Completed / Revised
+Nutrition Goal DocType — Transaction
+Field Name
+Type
+ Description
+ member
+Link → Member
+Goal owner
+goal_type
+Select
+Caloric Deficit / Caloric Surplus / Macro Balance / Hydration
+daily_calorie_goal
+Float
+Target daily calorie intake
+protein_goal_g
+Float
+Daily protein target
+tracking_start
+Date
+When tracking began
+current_avg_calories
+Float
+Rolling 7-day average calories consumed
+compliance_pct
+Float
+% of days target was met
+Supplement Log DocType — Transaction
+Field Name
+Type
+ Description
+ member
+Link → Member
+Member taking the supplement
+supplement_name
+Data
+e.g. Whey Protein, Creatine, Multivitamin
+brand
+Data
+Brand name
+dosage
+Data
+Dosage per serving (e.g. 30g, 5g)
+frequency
+Select
+Daily / Pre-Workout / Post-Workout / With Meals
+start_date
+Date
+When supplementation began
+end_date
+Date
+End date or blank if ongoing
+recommended_by
+Link → Trainer Profile
+Recommending trainer/dietitian
+notes
+Text
+Observations or adherence notes
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 20
+9. Module 7 — Billing & Finance
+Handles all revenue transactions — membership invoices, walk-in / day-pass payments, EMI schedule management, refund
+processing, and daily cash reconciliation. Integrates fully with ERPNext Sales Invoice, Payment Entry, and General Ledger.
+Membership Invoice DocType — Transaction
+Auto-generated on Member Subscription submit. Creates a linked ERPNext Sales Invoice.
+Field Name
+Type
+ Description
+ member
+Link → Member
+Invoice recipient
+subscription
+Link → Member
+Subscription
+Source subscription
+invoice_date
+Date
+Invoice generation date
+due_date
+Date
+Payment due date
+plan_amount
+Currency
+Plan fee before tax
+discount_amount
+Currency
+Discount applied
+taxable_amount
+Currency
+Amount after discount
+gst_amount
+Currency
+GST (CGST + SGST or IGST)
+total_amount
+Currency
+Final invoice total
+paid_amount
+Currency
+Amount received
+balance_due
+Currency
+Remaining outstanding
+payment_status
+Select
+Unpaid / Partially Paid / Paid / Overdue
+sales_invoice
+Link → Sales Invoice
+ERPNext Sales Invoice created on submit
+payment_entry
+Link → Payment Entry
+ERPNext Payment Entry when settled
+Walk-In Payment DocType — Transaction
+Point-of-sale record for walk-in customers (day passes, pool access, class drop-ins, merchandise, cafe).
+Field Name
+Type
+ Description
+ transaction_date
+Datetime
+Date and time of transaction
+member
+Link → Member
+Member (if known) or blank for walk-in guest
+service_type
+Select
+Day Pass / Pool Access / Group Class / PT Session / Merchandise / Cafe
+item
+Link → Item
+ERPNext Item for the service or product
+quantity
+Float
+Quantity purchased
+unit_price
+Currency
+Price per unit
+discount
+Currency
+Discount applied
+total_amount
+Currency
+Total charged
+payment_mode
+Select
+Cash / Card / UPI / Wallet
+staff
+Link → Employee
+Front desk staff who processed
+pos_invoice
+Link → POS Invoice
+ERPNext POS Invoice created
+EMI Schedule DocType — Transaction
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 21
+Auto-generated instalment schedule when a subscription is paid via EMI. Monthly scheduler triggers payment reminders.
+Field Name
+Type
+ Description
+ subscription
+Link → Member
+Subscription
+Source subscription
+member
+Link → Member
+Member paying via EMI
+total_amount
+Currency
+Total plan amount to be collected
+no_of_instalments
+Int
+Number of EMI instalments
+instalment_amount
+Currency
+Per-instalment amount (auto-calculated)
+instalments
+Table → EMI Instalment
+Individual instalment rows with due date, status, payment
+payment_mode
+Select
+Card Auto-Debit / UPI Mandate / Manual
+mandate_reference
+Data
+NACH / UPI mandate reference number
+status
+Select
+Active / Completed / Defaulted
+Refund Request DocType — Transaction
+Field Name
+Type
+ Description
+ member
+Link → Member
+Member requesting refund
+invoice
+Link → Membership
+Invoice
+Invoice to be refunded
+request_date
+Date
+Date refund was requested
+refund_reason
+Select
+Medical / Relocation / Dissatisfaction / Duplicate Payment / Other
+requested_amount
+Currency
+Amount requested by member
+approved_amount
+Currency
+Amount approved after policy deductions
+deductions_detail
+Text
+Breakdown of any deductions applied
+approved_by
+Link → User
+Approving manager
+refund_mode
+Select
+Original Payment Mode / Bank Transfer / Wallet Credit
+status
+Select
+Pending / Approved / Processed / Rejected
+credit_note
+Link → Credit Note
+ERPNext Credit Note created on approval
+Daily Cash Reconciliation DocType — Transaction
+Field Name
+Type
+ Description
+ reconciliation_date
+Date
+Date being reconciled
+shift
+Select
+Morning / Evening / Full Day
+opening_cash
+Currency
+Opening cash in drawer
+cash_collected
+Currency
+Total cash received (from POS + invoices)
+card_upi_total
+Currency
+Total card/UPI transactions
+total_receipts
+Currency
+Sum of all payment modes
+expenses_paid
+Currency
+Petty cash expenses paid out
+closing_cash_physical
+Currency
+Physical cash count at close
+expected_closing_cash
+Currency
+Calculated expected cash
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 22
+Field Name
+Type
+ Description
+ difference
+Currency
+Variance (physical minus expected)
+remarks
+Text
+Explanation for any difference
+reconciled_by
+Link → Employee
+Front desk staff who reconciled
+approved_by
+Link → User
+Accounts supervisor approval
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 23
+10. Module 8 — Reports & Analytics
+All reports are built as Frappe Script Reports with Query Report or Python-based data sources. Dashboards use ERPNext Number
+Cards and Chart components, exposed on the Fitness Manager Workspace.
+Report Name
+Type
+ Key Filters
+ Purpose
+ Member Enrollment &
+Retention
+Script Report
+Period, Plan, Branch
+New joins, renewals, drop-offs, churn rate by
+period
+Revenue Summary
+Script Report
+Period, Plan Type, Payment Mode
+Gross revenue, discounts, net collections,
+plan-wise split
+Trainer Performance Report
+Script Report
+Trainer, Period
+Sessions taken, member ratings, PT vs group,
+commission earned
+Class Occupancy Report
+Script Report
+Class Type, Period, Trainer
+Enrolled vs attended, avg occupancy %, peak
+time analysis
+Member Attendance Report
+Script Report
+Member, Period, Facility
+Visit frequency, avg duration, consecutive-day
+streaks
+Equipment Utilization &
+Downtime
+Script Report
+Equipment, Period
+Uptime %, maintenance cost, breakdown
+frequency
+Membership Expiry Alert
+Script Report
+Days to Expiry Threshold
+Members expiring in N days, renewal follow-up
+list
+Member Progress Dashboard
+Dashboard
+Member, Period
+Weight, BMI, body fat trend, goal achievement %
+Fitness Manager Dashboard
+Dashboard
+Branch, Period
+Active members, today's revenue, class
+occupancy, alerts
+Daily Cash Collection
+Script Report
+Date, Shift
+POS + invoice collections, mode-wise,
+reconciliation status
+Subscription Plan Analysis
+Script Report
+Plan, Period
+Plan-wise popularity, revenue, avg duration,
+renewal rate
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 24
+11. Workflows
+Workflow A — Member Onboarding to Active Subscription
+Step
+ Action / Document
+ Actor
+ Triggers
+ 1
+Prospect walks in or enquires online
+Front Desk
+Lead captured in CRM (optional)
+2
+Member form filled; ID and photo uploaded
+Front Desk
+Member record created (Draft)
+3
+Health assessment conducted; PAR-Q signed
+Trainer
+Health Profile created
+4
+Membership Plan selected; payment
+collected
+Front Desk
+Member Subscription created
+5
+Subscription submitted
+Front Desk
+Membership Invoice auto-generated
+6
+Invoice submitted
+Accounts
+ERPNext Sales Invoice + Payment Entry created
+7
+Subscription active; access card / QR issued
+System
+Member status → Active
+8
+Welcome SMS/email with portal link sent
+System (scheduler)
+Notification triggered on activation
+Workflow B — Class Booking to Attendance
+Step
+ Action / Document
+ Actor
+ Triggers
+ 1
+Member browses timetable on portal/app
+Member
+Class Schedule viewed
+2
+Member books a session
+Member / Front Desk
+Class Enrollment created (Confirmed or Waitlisted)
+3
+Class credit deducted if chargeable
+System
+Subscription class_credits_remaining decremented
+4
+Reminder notification sent 2 hrs before class
+System (scheduler)
+Email/SMS notification
+5
+Member checks in at studio
+Front Desk / Biometric
+Member Attendance record created
+6
+Trainer marks attendance post-class
+Trainer
+Class Attendance updated; no-shows flagged
+7
+Late cancellation penalty applied if applicable
+System
+Credit not refunded; penalty logged
+8
+Member rates session (1–5)
+Member (portal)
+Rating saved to Class Attendance
+Workflow C — Equipment Breakdown to Resolution
+Step
+ Action / Document
+ Actor
+ Triggers
+ 1
+Breakdown reported by member or staff
+Staff / Member
+Maintenance Log created (Breakdown type)
+2
+Equipment status set to Under Maintenance
+Facility Supervisor
+Equipment Register status updated
+3
+AMC vendor notified if under contract
+System
+Vendor email alert triggered
+4
+Technician visits; repairs conducted
+Vendor Technician
+Maintenance Log updated with work done
+5
+Parts replaced logged; cost recorded
+Facility Supervisor
+Costs captured for asset expense tracking
+6
+Equipment cleared for use
+Facility Supervisor
+Status → Operational; next service date set
+7
+Purchase Invoice raised for repair cost
+Accounts
+ERPNext Purchase Invoice created
+Workflow D — Subscription Expiry & Renewal
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 25
+Step
+ Action / Document
+ Actor
+ Triggers
+ 1
+7-day expiry reminder sent to member
+System (scheduler)
+Membership Expiry Alert report scanned daily
+2
+1-day reminder sent
+System
+Final SMS/email notification
+3
+Member visits or calls to renew
+Member / Front Desk
+New Member Subscription created
+4
+Renewal discount applied from plan settings
+System
+discount_on_renewal % applied automatically
+5
+Subscription submitted; invoice generated
+Front Desk
+Membership Invoice auto-created
+6
+Payment collected and posted
+Accounts
+Sales Invoice marked Paid
+7
+New subscription linked to old as renewal_of
+System
+Retention history maintained
+DocType Approval States
+ DocType
+ Draft
+Intermediate
+Submitted / Final
+Cancelled
+Member Subscription
+Data entry
+Pending Payment
+Active / Expired
+Cancelled
+Membership Invoice
+Draft
+Sent to Member
+Paid / Overdue
+Voided
+Refund Request
+Requested
+Under Review
+Processed
+Rejected
+Class Enrollment
+Booked
+Waitlisted
+Confirmed / Attended
+Cancelled
+Maintenance Log
+Reported
+In Progress
+Completed
+Voided
+Trainer Commission
+Generated
+Under Review
+Approved / Paid
+Voided
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 26
+12. ERPNext Integration Points
+The FWS app integrates with six ERPNext modules. All links use standard Frappe Link fields — no monkey-patching or core file
+edits are required.
+Accounts & Finance
+ Membership Invoice auto-creates Sales Invoice (member as Customer)
+ Walk-In Payment creates POS Invoice with real-time stock deduction
+ Trainer Commission creates Journal Entry (Salary/Commission expense)
+ Refund creates Credit Note linked to original Sales Invoice
+ Cost Centres defined per branch, service line (Classes, PT, Cafe)
+ Daily Cash Reconciliation feeds into ERPNext Bank Reconciliation
+Sales & CRM
+ Member registered as ERPNext Customer (customer_group = Fitness Member)
+ Corporate accounts handled via ERPNext Customer hierarchy
+ Sales Invoice tracks plan revenue by item / service type
+ CRM Lead can be converted to Member on enrollment
+Stock & Inventory
+ Merchandise and supplements tracked as ERPNext Items
+ Walk-In Payment triggers automatic Stock Ledger Entry
+ Supplement and retail item reorder alerts via ERPNext reorder levels
+ Physical stock audit via ERPNext Stock Reconciliation
+HR & Payroll
+ Trainers and staff managed as ERPNext Employees
+ Shift Management used for front desk and trainer schedules
+ Leave applications managed via ERPNext Leave Module
+ Trainer commission fed as salary component in ERPNext Payroll
+Fixed Assets
+ Gym equipment registered as ERPNext Fixed Assets
+ Depreciation scheduled per asset category (Cardio / Strength / etc.)
+ Maintenance costs expensed against asset account
+ Asset disposal tracked on equipment scrap / sale
+Quality
+ Pool water quality tests logged as Quality Inspections
+ FSSAI / FSSAI-equivalent compliance for cafe / supplements
+ Non-conformance records for failed equipment tests
+Custom Fields on ERPNext DocTypes
+These fields extend ERPNext core DocTypes without modifying core files. Exported as fixtures/custom_fields.json.
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 27
+ERPNext DocType
+Custom Field
+Type
+ Purpose
+ Customer
+is_fitness_member
+Check
+Marks this customer as a gym member
+Customer
+member_profile
+Link → Member
+Direct link to Member DocType
+Customer
+membership_status
+Data
+Synced active status for CRM use
+Employee
+trainer_profile
+Link → Trainer
+Profile
+Links employee to trainer record
+Employee
+trainer_specialization
+Data
+Trainer specialty for HR dashboards
+Item
+is_fitness_service
+Check
+Marks item as a fitness service/class
+Item
+item_category_fitness
+Select
+Class / PT / Day Pass / Merchandise / Cafe
+Sales Invoice
+membership_period
+Data
+Billing period (e.g. June 2026)
+Sales Invoice
+member_subscription
+Link → Member
+Subscription
+Trace invoice to subscription
+Asset
+equipment_register
+Link → Equipment
+Register
+Links asset to gym equipment
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 28
+13. Implementation Roadmap
+Phase 1 — Weeks 1–3 — Foundation & Setup
+ Create Frappe app with bench new-app fitness_wellness
+ Configure hooks.py: scheduler events, doc events, roles (7 custom roles)
+ Define permission matrices for all roles
+ Build Workspace module tiles and navigation layout
+ Create all Master DocTypes: Member, Membership Plan, Class Type, Trainer Profile, Equipment Register, Food Item, Deduction
+Type
+ Export initial fixtures: roles.json, custom_fields.json, property_setters.json
+ Install and configure ERPNext custom fields on Customer, Employee, Item, Asset
+Phase 2 — Weeks 4–8 — Member, Class & Attendance Management
+ Build Member Subscription with plan pricing and auto-end-date calculation
+ Implement Membership Invoice auto-creation and ERPNext Sales Invoice link
+ Build Member Attendance with biometric/QR integration hooks
+ Build Subscription Freeze with end-date extension logic
+ Build Class Schedule with capacity management
+ Build Class Enrollment with credit deduction and waitlist logic
+ Build Class Attendance with per-member marking and ratings
+ Scheduler: daily expiry reminders, monthly invoice auto-generation
+ Script Report: Membership Expiry Alert, Class Occupancy Report
+Phase 3 — Weeks 9–13 — Trainer, Facility & Health Modules
+ Build Trainer Profile with certification tracking and availability slots
+ Build Trainer Assignment (PT member linking) and session tracking
+ Build Trainer Commission auto-calculation with Journal Entry integration
+ Build Equipment Register linked to ERPNext Fixed Assets
+ Build Maintenance Schedule with due-date alerts and AMC Contract management
+ Build Locker Master and Locker Assignment workflow
+ Build Health Profile, Body Metric Log, Fitness Test, and Fitness Goal DocTypes
+ Build goal progress auto-calculation from metric logs
+ Script Report: Equipment Downtime, Trainer Performance
+Phase 4 — Weeks 14–17 — Nutrition, Billing & Finance
+ Build Food Item master with macro nutrient data
+ Build Meal Template and Diet Plan with daily meal schedule
+ Build Nutrition Goal tracking with compliance calculation
+ Build Walk-In Payment with POS Invoice integration
+ Build EMI Schedule with instalment table and auto-deduction scheduler
+ Build Refund Request workflow with Credit Note integration
+ Build Daily Cash Reconciliation with opening/closing cash logic
+ Script Report: Revenue Summary, Daily Cash Collection
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 29
+Phase 5 — Weeks 18–22 — Reports, Dashboards & Member Portal
+ Build all 11 Script Reports with filters and Excel/PDF export
+ Build Fitness Manager Dashboard with Number Cards and Charts
+ Build Member Progress Dashboard (BMI trend, goal completion)
+ Member self-service portal: class booking, invoice history, progress tracking
+ Mobile-optimized check-in form for front desk staff
+ Push notification / SMS integration for booking confirmations and reminders
+ UAT with fitness centre operations staff, training documentation
+ Go-live support and post-launch monitoring
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 30
+14. Technical Decisions & Configuration
+Naming Series
+ DocType
+ Naming Series
+ Example
+ Member
+MEM-.YYYY.-.####
+MEM-2026-0001
+Member Subscription
+SUB-.YYYY.MM.-.####
+SUB-2026-06-0088
+Membership Invoice
+MINV-.YYYY.MM.-.###
+#
+MINV-2026-06-0042
+Class Schedule
+CLS-.YYYY.-.####
+CLS-2026-0015
+Class Enrollment
+ENR-.YYYY.MM.DD.-.#
+##
+ENR-2026-06-15-001
+Trainer Profile
+TRN-.YYYY.-.###
+TRN-2026-001
+Trainer Commission
+TCOM-.YYYY.MM.-.###
+#
+TCOM-2026-06-0007
+Equipment Register
+EQP-.YYYY.-.####
+EQP-2026-0099
+Maintenance Log
+MLOG-.YYYY.-.####
+MLOG-2026-0033
+Refund Request
+REF-.YYYY.MM.-.####
+REF-2026-06-0005
+Diet Plan
+DIET-.YYYY.-.####
+DIET-2026-0012
+Proration & EMI Calculation Engine
+Core billing logic lives in fitness_wellness/utils/calculations.py. Called on Member Subscription before_save.
+# fitness_wellness/utils/calculations.py
+import frappe
+from frappe.utils import flt, date_diff, add_months, today
+def calculate_prorated_amount(plan_price, start_date, billing_day=1):
+    """
+    Calculate prorated amount when subscription starts mid-cycle.
+    Returns full amount if starting on or before billing day.
+    """
+    from datetime import date
+    start = frappe.utils.getdate(start_date)
+    days_in_month = 30
+    if start.day <= billing_day:
+        return flt(plan_price)
+    days_remaining = days_in_month - start.day + billing_day
+    return flt(plan_price * days_remaining / days_in_month)
+def generate_emi_schedule(subscription_name, total_amount, no_of_instalments, start_date):
+    """
+    Generate EMI instalment rows for a given subscription.
+    Called via hooks on Member Subscription submit when payment_mode == 'EMI'.
+    """
+    instalment_amount = flt(total_amount / no_of_instalments, 2)
+    schedule = []
+    for i in range(no_of_instalments):
+        due_date = add_months(start_date, i)
+        schedule.append({
+            "instalment_no": i + 1,
+            "due_date": due_date,
+            "amount": instalment_amount,
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 31
+            "status": "Pending",
+            "payment_reference": ""
+        })
+    # Adjust last instalment for rounding difference
+    collected = instalment_amount * (no_of_instalments - 1)
+    schedule[-1]["amount"] = flt(total_amount - collected, 2)
+    return schedule
+def calculate_trainer_commission(trainer, period_from, period_to):
+    """
+    Sum commission-eligible sessions for a trainer in the period.
+    """
+    trainer_doc = frappe.get_doc("Trainer Profile", trainer)
+    # Count group sessions
+    group_sessions = frappe.db.count("Class Attendance",
+        filters={"trainer": trainer, "session_date": ["between", [period_from, period_to]]})
+    # Count PT sessions
+    pt_sessions = frappe.db.count("Trainer Assignment",
+        filters={"trainer": trainer, "session_date": ["between", [period_from, period_to]]})
+    if trainer_doc.commission_type == "Per Session":
+        gross = (group_sessions + pt_sessions) * flt(trainer_doc.commission_rate)
+    else:
+        gross = flt(trainer_doc.commission_rate)
+    tds = flt(gross * 0.10)  # 10% TDS
+    return {"gross_commission": gross, "tds_deducted": tds,
+            "net_payable": gross - tds,
+            "group_sessions_taken": group_sessions,
+            "pt_sessions_taken": pt_sessions}
+Installation Commands
+# 1. Create the app
+bench new-app fitness_wellness
+# 2. Install on your ERPNext site
+bench --site your-site.local install-app fitness_wellness
+# 3. Run database migrations
+bench --site your-site.local migrate
+# 4. Restart bench services
+bench restart
+# 5. Clear cache
+bench --site your-site.local clear-cache
+# 6. (Optional) Load demo fixtures and sample plans
+bench --site your-site.local execute fitness_wellness.setup.load_demo_data
+Server Requirements
+ Component
+ Minimum
+ Recommended
+ OS
+Ubuntu 20.04 LTS
+Ubuntu 22.04 LTS
+Python
+3.10+
+3.11+
+Node.js
+18.x
+20.x LTS
+MariaDB
+10.6+
+10.11+
+Redis
+6.x
+7.x
+RAM
+8 GB
+16 GB
+Fitness & Wellness Management System — Frappe / ERPNext v15+
+Confidential | fitness_wellness Frappe App
+Architecture & Implementation Guide  |  Version 1.0  |  2026
+Page 32
+ Component
+ Minimum
+ Recommended
+ Disk
+50 GB SSD
+200 GB SSD
+ERPNext
+v15.0
+v15 latest
+Frappe
+v15.0
+v15 latest
+■ For multi-branch deployments, use ERPNext's Company and Branch masters. All DocTypes include a 'branch' Link field (not shown in
+individual tables for brevity) that maps to the ERPNext Company Branch master for data segregation.
