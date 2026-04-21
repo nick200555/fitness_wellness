@@ -4,6 +4,7 @@ app_publisher = "Your Organization"
 app_description = "Fitness and Wellness Management System for ERPNext v15+"
 app_email = "admin@example.com"
 app_license = "mit"
+app_include_js = "/assets/fitness_wellness/js/fitness_wellness.bundle.js"
 
 scheduler_events = {
 	"daily": [
