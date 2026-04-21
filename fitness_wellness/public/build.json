@@ -1,5 +1,5 @@
 {
   "fitness_wellness.bundle.js": [
-    "fitness_wellness/public/js/fitness_wellness.js"
+    "public/js/fitness_wellness.js"
   ]
 }
